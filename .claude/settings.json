@@ -53,7 +53,10 @@
       "Bash(git commit -q -m 'feat: The Atelier — study-to-reveal procedural ASCII art + daily gallery *)",
       "Bash(python3 -)",
       "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --force-device-scale-factor=1 --hide-scrollbars --screenshot=/private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/samaya.png --window-size=1440,700 --virtual-time-budget=9000 http://localhost:3111)",
-      "Bash(git commit -q -m 'feat: SAMAYA royal wordmark + Matrix binary cursor trail *)"
+      "Bash(git commit -q -m 'feat: SAMAYA royal wordmark + Matrix binary cursor trail *)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\\\\n\" http://localhost:3111/log)",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --force-device-scale-factor=1 --hide-scrollbars --screenshot=/private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/atelier2.png --window-size=1440,1250 --virtual-time-budget=9000 http://localhost:3111/log)",
+      "Bash(git commit -q -m 'feat: Atelier pieces in any colour — day-seeded palettes + brightness-band inks *)"
     ]
   }
 }

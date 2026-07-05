@@ -89,12 +89,22 @@ export function AsciiArt({
     return sortedAsc[idx] ?? Infinity;
   }, [sortedAsc, progress]);
 
-  // Front layer: revealed true glyphs.
-  const frontText = useMemo(() => {
-    if (!field) return "";
-    return field
-      .map((row) => row.map((b) => (b >= threshold ? rampChar(b) : " ")).join(""))
-      .join("\n");
+  // Front layers: revealed glyphs split into three brightness bands, each
+  // painted its own palette tone — dim edges pale, mid structure deeper,
+  // the burning core in the strongest hue. Reads like layered riso inks.
+  const bands = useMemo(() => {
+    if (!field) return null;
+    const inBand = (b: number, lo: number, hi: number) =>
+      b >= threshold && b >= lo && b < hi;
+    const render = (lo: number, hi: number) =>
+      field
+        .map((row) => row.map((b) => (inBand(b, lo, hi) ? rampChar(b) : " ")).join(""))
+        .join("\n");
+    return {
+      dim: render(0, 0.45),
+      mid: render(0.45, 0.75),
+      bright: render(0.75, Infinity),
+    };
   }, [field, threshold]);
 
   // Back layer: shimmering static in the unrevealed footprint. Animated via a
@@ -123,7 +133,7 @@ export function AsciiArt({
       .join("\n");
   }, [field, threshold, tick, reduceMotion, descriptor.seed]);
 
-  const [core, mid, halo] = AURORAS[descriptor.aurora];
+  const [core, mid, halo, wash] = AURORAS[descriptor.aurora];
   const preBase: React.CSSProperties = {
     fontFamily: "var(--font-jetbrains), ui-monospace, monospace",
     fontSize,
@@ -153,19 +163,47 @@ export function AsciiArt({
       >
         {backText}
       </pre>
-      {/* front: revealed glyphs in the aura gradient */}
+      {/* front: three brightness bands, each in its own palette tone */}
+      <pre style={{ ...preBase, position: "relative", color: "transparent" }}>
+        {/* sizer — keeps the box dimensions while bands stack above */}
+        {bands?.bright || " "}
+      </pre>
       <pre
         style={{
           ...preBase,
-          position: "relative",
-          backgroundImage: `linear-gradient(135deg, ${core}, ${mid} 55%, ${halo})`,
+          position: "absolute",
+          inset: 0,
+          color: wash,
+          opacity: 0.9,
+        }}
+      >
+        {bands?.dim ?? ""}
+      </pre>
+      <pre
+        style={{
+          ...preBase,
+          position: "absolute",
+          inset: 0,
+          backgroundImage: `linear-gradient(160deg, ${mid}, ${halo})`,
           WebkitBackgroundClip: "text",
           backgroundClip: "text",
           color: "transparent",
-          filter: glow ? `drop-shadow(0 0 6px color-mix(in srgb, ${core} 45%, transparent))` : undefined,
         }}
       >
-        {frontText || " "}
+        {bands?.mid ?? ""}
+      </pre>
+      <pre
+        style={{
+          ...preBase,
+          position: "absolute",
+          inset: 0,
+          color: core,
+          filter: glow
+            ? `drop-shadow(0 0 6px color-mix(in srgb, ${core} 50%, transparent))`
+            : undefined,
+        }}
+      >
+        {bands?.bright ?? ""}
       </pre>
     </div>
   );

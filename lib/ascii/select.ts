@@ -8,6 +8,7 @@ import { format } from "date-fns";
 import type { StudySession, Subject, ArtDescriptor } from "@/lib/types";
 import type { GeneratorId } from "./generators";
 import { hashString } from "./rng";
+import { ART_AURORAS } from "@/lib/aura-palettes";
 
 // Known TUM codes → their themed generator family. Unknown subjects fall back
 // to a family chosen deterministically from their id, so they stay consistent.
@@ -63,8 +64,13 @@ export function artForDay(
   const domId = dominantSubjectId(dayKey, sessions);
   const subject = domId ? subjects.find((s) => s.id === domId) : undefined;
 
+  // Colour is the day's own — any palette, picked by the date seed —
+  // so the library spans the full spectrum instead of five fixed hues.
+  const aurora =
+    ART_AURORAS[hashString(`${dayKey}-hue`) % ART_AURORAS.length] ?? "warm";
+
   if (!subject) {
-    return { generator: "field", seed: String(seed), aurora: "warm" };
+    return { generator: "field", seed: String(seed), aurora };
   }
   const fam = familyFor(subject);
   const generator = fam[seed % fam.length] ?? fam[0]!;
@@ -72,6 +78,6 @@ export function artForDay(
     generator,
     seed: String(seed),
     subjectId: subject.id,
-    aurora: subject.aurora,
+    aurora,
   };
 }
