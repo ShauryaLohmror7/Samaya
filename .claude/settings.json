@@ -27,7 +27,9 @@
       "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --force-device-scale-factor=1 --hide-scrollbars --screenshot=/private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/mobile2.png --window-size=390,844 --virtual-time-budget=9000 http://localhost:3111)",
       "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --force-device-scale-factor=1 --hide-scrollbars --screenshot=/private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/mobile3.png --window-size=600,1050 --virtual-time-budget=9000 http://localhost:3111)",
       "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --force-device-scale-factor=1 --hide-scrollbars --screenshot=/private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/night.png --window-size=1440,900 --virtual-time-budget=9000 http://localhost:3111/?theme=night)",
-      "Bash(git commit -q -m 'docs: README with screenshots, design notes, decisions; night-theme URL override *)"
+      "Bash(git commit -q -m 'docs: README with screenshots, design notes, decisions; night-theme URL override *)",
+      "Bash(curl -s -o /dev/null -w \"GET / -> %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(git commit -q -m 'fix: migrate pre-aurora persisted subjects \\(v1→v2\\) + import fallback *)"
     ]
   }
 }

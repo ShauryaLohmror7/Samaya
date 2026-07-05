@@ -564,8 +564,12 @@ export const useAura = create<AuraState>()(
         if (bundle.app !== "aura" || !Array.isArray(bundle.subjects)) {
           throw new Error("Not a valid Aura export file.");
         }
+        const palettes = ["lagoon", "polar", "meadow", "orchid", "glacier"] as const;
         set({
-          subjects: bundle.subjects,
+          subjects: bundle.subjects.map((s, i) => ({
+            ...s,
+            aurora: s.aurora ?? palettes[i % palettes.length]!,
+          })),
           sessions: bundle.sessions ?? [],
           dailyLogs: bundle.dailyLogs ?? {},
           settings: { ...defaultSettings(), ...bundle.settings },
@@ -575,7 +579,19 @@ export const useAura = create<AuraState>()(
     }),
     {
       name: "aura-store",
-      version: 1,
+      version: 2,
+      migrate: (persisted) => {
+        // v1 → v2: subjects gained a per-page `aurora` palette.
+        const state = persisted as Partial<AuraState>;
+        const palettes = ["lagoon", "polar", "meadow", "orchid", "glacier"] as const;
+        if (Array.isArray(state.subjects)) {
+          state.subjects = state.subjects.map((s, i) => ({
+            ...s,
+            aurora: s.aurora ?? palettes[i % palettes.length]!,
+          }));
+        }
+        return state as AuraState;
+      },
       storage: createJSONStorage(createIdbStorage),
       partialize: (s) => ({
         subjects: s.subjects,

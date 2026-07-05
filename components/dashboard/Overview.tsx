@@ -134,7 +134,7 @@ export function Overview() {
             .filter((x) => x.subjectId === subj.id)
             .reduce((a, x) => a + x.durationMinutes, 0);
           const days = subj.examDate ? daysUntil(subj.examDate) : null;
-          const [c0, , c2] = AURORAS[subj.aurora];
+          const [c0, , c2] = AURORAS[subj.aurora] ?? AURORAS.lagoon;
           return (
             <motion.li
               key={subj.id}
