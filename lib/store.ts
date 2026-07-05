@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { createIdbStorage } from "./storage";
 import { seedSubjects, defaultSettings } from "./seed";
 import { artForDay } from "./ascii/select";
+import { customCategoryId } from "./categories";
 import type {
   Subject,
   StudySession,
@@ -14,6 +15,7 @@ import type {
   Status,
   Category,
   SessionCategory,
+  CustomSessionCategory,
   PastPaper,
   ExportBundle,
   TimerPreset,
@@ -82,8 +84,9 @@ interface AuraState {
   addSubject: (input: Omit<Subject, "id" | "weeks" | "pastPapers" | "focusTopics"> & { id?: string }) => string;
   updateSubject: (id: string, patch: Partial<Subject>) => void;
   deleteSubject: (id: string) => void;
-  setWeekStatus: (subjectId: string, week: number, category: Category, status: Status) => void;
-  cycleWeekStatus: (subjectId: string, week: number, category: Category) => void;
+  addCustomAspect: (subjectId: string, label: string) => void;
+  setWeekStatus: (subjectId: string, week: number, category: Category | CustomSessionCategory, status: Status) => void;
+  cycleWeekStatus: (subjectId: string, week: number, category: Category | CustomSessionCategory) => void;
   setWeekNote: (subjectId: string, week: number, note: string) => void;
   cycleMilestoneStatus: (subjectId: string, milestoneId: string) => void;
   addMilestone: (subjectId: string, label: string) => void;
@@ -209,6 +212,7 @@ export const useAura = create<AuraState>()(
             homework: "todo" as const,
             tutorial: "todo" as const,
           })),
+          customAspects: input.customAspects ?? [],
           pastPapers: [],
           focusTopics: [],
           ...(input.kind === "project" ? { milestones: [] } : {}),
@@ -229,6 +233,7 @@ export const useAura = create<AuraState>()(
                   lecture: "todo" as const,
                   homework: "todo" as const,
                   tutorial: "todo" as const,
+                  custom: Object.fromEntries((subj.customAspects ?? []).map((a) => [a.id, "todo" as const])),
                 }
               );
             }
@@ -239,17 +244,42 @@ export const useAura = create<AuraState>()(
       deleteSubject: (id) =>
         set((s) => ({ subjects: s.subjects.filter((subj) => subj.id !== id) })),
 
+      addCustomAspect: (subjectId, label) =>
+        set((s) => {
+          const clean = label.trim();
+          if (!clean) return {};
+          const id = newId();
+          return {
+            subjects: updateSubjectIn(s.subjects, subjectId, (subj) => ({
+              ...subj,
+              customAspects: [...(subj.customAspects ?? []), { id, label: clean }],
+              weeks: subj.weeks.map((w) => ({
+                ...w,
+                custom: { ...(w.custom ?? {}), [id]: "todo" as const },
+              })),
+            })),
+          };
+        }),
+
       setWeekStatus: (subjectId, week, category, status) =>
         set((s) => ({
           subjects: updateSubjectIn(s.subjects, subjectId, (subj) => ({
             ...subj,
-            weeks: subj.weeks.map((w) => (w.week === week ? { ...w, [category]: status } : w)),
+            weeks: subj.weeks.map((w) => {
+              if (w.week !== week) return w;
+              const customId = customCategoryId(category);
+              return customId
+                ? { ...w, custom: { ...(w.custom ?? {}), [customId]: status } }
+                : { ...w, [category]: status };
+            }),
           })),
         })),
 
       cycleWeekStatus: (subjectId, week, category) => {
         const subj = get().subjects.find((x) => x.id === subjectId);
-        const current = subj?.weeks.find((w) => w.week === week)?.[category] ?? "todo";
+        const row = subj?.weeks.find((w) => w.week === week);
+        const customId = customCategoryId(category);
+        const current = customId ? row?.custom?.[customId] ?? "todo" : row?.[category as Category] ?? "todo";
         get().setWeekStatus(subjectId, week, category, STATUS_CYCLE[current]);
       },
 
@@ -608,6 +638,14 @@ export const useAura = create<AuraState>()(
           subjects: bundle.subjects.map((s, i) => ({
             ...s,
             aurora: s.aurora ?? palettes[i % palettes.length]!,
+            customAspects: s.customAspects ?? [],
+            weeks: s.weeks.map((w) => ({
+              ...w,
+              custom: {
+                ...Object.fromEntries((s.customAspects ?? []).map((a) => [a.id, "todo" as const])),
+                ...(w.custom ?? {}),
+              },
+            })),
           })),
           sessions: bundle.sessions ?? [],
           dailyLogs: bundle.dailyLogs ?? {},
@@ -627,6 +665,14 @@ export const useAura = create<AuraState>()(
           state.subjects = state.subjects.map((s, i) => ({
             ...s,
             aurora: s.aurora ?? palettes[i % palettes.length]!,
+            customAspects: s.customAspects ?? [],
+            weeks: s.weeks.map((w) => ({
+              ...w,
+              custom: {
+                ...Object.fromEntries((s.customAspects ?? []).map((a) => [a.id, "todo" as const])),
+                ...(w.custom ?? {}),
+              },
+            })),
           }));
         }
         // v2 → v3: the Atelier added a daily reveal target.

@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { AnimatePresence, motion } from "motion/react";
@@ -13,6 +13,7 @@ import {
   daysUntil,
   formatMinutes,
 } from "@/lib/derive";
+import { BUILTIN_TRACKS, categoryLabel, sessionCategoryOptions } from "@/lib/categories";
 import { SceneAura } from "@/components/atmosphere/SceneAura";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProgressRing } from "@/components/ui/ProgressRing";
@@ -49,12 +50,14 @@ export function SubjectDetail({ id }: { id: string }) {
     deleteSession,
     updateSubject,
     deleteSubject,
+    addCustomAspect,
   } = useAura();
 
   const subject = subjects.find((s) => s.id === id);
 
   const [editOpen, setEditOpen] = useState(false);
   const [paperLabel, setPaperLabel] = useState("");
+  const [aspectLabel, setAspectLabel] = useState("");
   const [topicText, setTopicText] = useState("");
   const [milestoneLabel, setMilestoneLabel] = useState("");
   // manual log form
@@ -74,6 +77,13 @@ export function SubjectDetail({ id }: { id: string }) {
   );
   const totalMin = subjectSessions.reduce((a, s) => a + s.durationMinutes, 0);
   const byCategory = useMemo(() => minutesByCategory(subjectSessions), [subjectSessions]);
+  const categoryOptions = useMemo(() => sessionCategoryOptions(subject), [subject]);
+
+  useEffect(() => {
+    if (!categoryOptions.some((option) => option.value === logCat)) {
+      setLogCat("general");
+    }
+  }, [categoryOptions, logCat]);
 
   if (!subject) {
     return (
@@ -281,8 +291,8 @@ export function SubjectDetail({ id }: { id: string }) {
             right={
               <span className="flex items-center gap-4">
                 <span className="font-mono text-xs" style={{ color: "var(--ink-soft)" }}>
-                  {(["lecture", "homework", "tutorial"] as const)
-                    .map((t) => `${t[0]!.toUpperCase()} ${trackProgress(subject, t).done}/${subject.totalWeeks}`)
+                  {BUILTIN_TRACKS
+                    .map((t) => `${t.label[0]} ${trackProgress(subject, t.key).done}/${subject.totalWeeks}`)
                     .join(" · ")}
                 </span>
                 <span className="flex items-center gap-1.5" aria-label="Number of weeks">
@@ -312,6 +322,28 @@ export function SubjectDetail({ id }: { id: string }) {
             Review grid
           </SectionHeading>
           <WeeklyGrid subject={subject} />
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (aspectLabel.trim()) {
+                addCustomAspect(subject.id, aspectLabel.trim());
+                setAspectLabel("");
+              }
+            }}
+            className="mt-3 flex items-end gap-3"
+          >
+            <div className="flex-1">
+              <TextInput
+                value={aspectLabel}
+                onChange={(e) => setAspectLabel(e.target.value)}
+                placeholder='e.g. "Extra homework"'
+                aria-label="New review aspect"
+              />
+            </div>
+            <PillButton size="sm" type="submit">
+              Add aspect
+            </PillButton>
+          </form>
         </>
       )}
 
@@ -505,7 +537,7 @@ export function SubjectDetail({ id }: { id: string }) {
               .sort((a, b) => b[1] - a[1])
               .map(([cat, min]) => (
                 <li key={cat} className="flex items-center gap-3">
-                  <span className="microlabel w-24 shrink-0">{cat.replace("_", " ")}</span>
+                  <span className="microlabel w-24 shrink-0">{categoryLabel(cat, subject)}</span>
                   <div className="h-2.5 flex-1 overflow-hidden rounded-full" style={{ background: "var(--line)" }}>
                     <motion.div
                       className="h-full rounded-full"
@@ -543,7 +575,7 @@ export function SubjectDetail({ id }: { id: string }) {
                   <span className="font-mono text-xs tabular" style={{ color: "var(--ink-faint)" }}>
                     {format(new Date(s.startedAt), "d MMM HH:mm")}
                   </span>
-                  <span className="microlabel">{(s.category ?? "general").replace("_", " ")}{s.weekRef ? ` · w${s.weekRef}` : ""}</span>
+                  <span className="microlabel">{categoryLabel(s.category, subject)}{s.weekRef ? ` · w${s.weekRef}` : ""}</span>
                   <span className="flex-1 truncate text-xs" style={{ color: "var(--ink-soft)" }}>
                     {s.note}
                   </span>
@@ -580,11 +612,11 @@ export function SubjectDetail({ id }: { id: string }) {
           <div className="grid grid-cols-2 gap-4">
             <Field label="Category">
               <Select value={logCat} onChange={(e) => setLogCat(e.target.value as SessionCategory)}>
-                <option value="general">General</option>
-                <option value="lecture">Lecture</option>
-                <option value="homework">Homework</option>
-                <option value="tutorial">Tutorial</option>
-                <option value="past_paper">Past paper</option>
+                {categoryOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
               </Select>
             </Field>
             <Field label="Week (optional)">

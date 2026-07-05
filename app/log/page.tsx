@@ -5,6 +5,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { format, isSameDay } from "date-fns";
 import { useAura } from "@/lib/store";
 import { formatMinutes } from "@/lib/derive";
+import { categoryLabel } from "@/lib/categories";
 import { PageTitle } from "@/components/ui/PageTitle";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { PillButton } from "@/components/ui/PillButton";
@@ -130,7 +131,7 @@ export default function LogPage() {
                       />
                       <span className="w-14 font-mono text-xs">{subj?.code ?? "?"}</span>
                       <span className="microlabel hidden sm:inline">
-                        {(s.category ?? "general").replace("_", " ")}
+                        {categoryLabel(s.category, subj)}
                         {s.weekRef ? ` · w${s.weekRef}` : ""}
                       </span>
                       <span className="flex-1 truncate text-xs" style={{ color: "var(--ink-soft)" }}>

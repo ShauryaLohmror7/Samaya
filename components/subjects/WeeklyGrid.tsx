@@ -3,13 +3,8 @@
 import { motion } from "motion/react";
 import { useAura } from "@/lib/store";
 import { trackProgress } from "@/lib/derive";
-import { AURA_HUE_VAR, type Category, type Status, type Subject } from "@/lib/types";
-
-const TRACKS: { key: Category; label: string }[] = [
-  { key: "lecture", label: "Lecture" },
-  { key: "homework", label: "Homework" },
-  { key: "tutorial", label: "Tutorial" },
-];
+import { BUILTIN_TRACKS, customCategory, customCategoryId } from "@/lib/categories";
+import { AURA_HUE_VAR, type Category, type CustomSessionCategory, type SessionCategory, type Status, type Subject } from "@/lib/types";
 
 const NEXT: Record<Status, string> = {
   todo: "mark in progress",
@@ -24,6 +19,13 @@ const NEXT: Record<Status, string> = {
 export function WeeklyGrid({ subject }: { subject: Subject }) {
   const cycleWeekStatus = useAura((s) => s.cycleWeekStatus);
   const hue = AURA_HUE_VAR[subject.color];
+  const tracks: { key: SessionCategory; label: string }[] = [
+    ...BUILTIN_TRACKS,
+    ...(subject.customAspects ?? []).map((aspect) => ({
+      key: customCategory(aspect.id),
+      label: aspect.label,
+    })),
+  ];
 
   return (
     <div className="overflow-x-auto pb-2" role="grid" aria-label="Weekly review grid">
@@ -42,22 +44,23 @@ export function WeeklyGrid({ subject }: { subject: Subject }) {
           </tr>
         </thead>
         <tbody>
-          {TRACKS.map((track) => {
-            const p = trackProgress(subject, track.key);
+          {tracks.map((track) => {
+            const p = trackProgress(subject, track.key as Category | CustomSessionCategory);
             return (
               <tr key={track.key}>
                 <td className="sticky left-0 z-10 whitespace-nowrap pr-4 text-xs uppercase tracking-[0.14em]" style={{ color: "var(--ink-soft)", background: "transparent" }}>
                   {track.label}
                 </td>
                 {subject.weeks.map((w) => {
-                  const status = w[track.key];
+                  const customId = customCategoryId(track.key);
+                  const status = customId ? w.custom?.[customId] ?? "todo" : w[track.key as Category];
                   return (
                     <td key={w.week} className="px-1 text-center">
                       <motion.button
                         whileHover={{ scale: 1.25 }}
                         whileTap={{ scale: 0.85 }}
                         transition={{ type: "spring", stiffness: 500, damping: 22 }}
-                        onClick={() => cycleWeekStatus(subject.id, w.week, track.key)}
+                        onClick={() => cycleWeekStatus(subject.id, w.week, track.key as Category | CustomSessionCategory)}
                         aria-label={`${track.label} week ${w.week}: ${status.replace("_", " ")} — ${NEXT[status]}`}
                         className="relative mx-auto block h-6 w-6 rounded-full"
                         style={{ border: `1.5px solid ${status === "todo" ? "var(--line-strong)" : hue}` }}

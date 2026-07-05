@@ -4,7 +4,8 @@ import type { GeneratorId } from "./ascii/generators";
 import type { AuroraName } from "./aura-palettes";
 
 export type Category = "lecture" | "homework" | "tutorial";
-export type SessionCategory = Category | "past_paper" | "general";
+export type CustomSessionCategory = `custom:${string}`;
+export type SessionCategory = Category | "past_paper" | "general" | CustomSessionCategory;
 export type Status = "todo" | "in_progress" | "done";
 
 /** GRA is a project, not an exam course — its weeks track milestones. */
@@ -15,6 +16,7 @@ export interface WeekProgress {
   lecture: Status;
   homework: Status;
   tutorial: Status;
+  custom?: Record<string, Status>;
   note?: string;
 }
 
@@ -31,6 +33,11 @@ export interface FocusTopic {
   id: string;
   text: string;
   done: boolean;
+}
+
+export interface CustomAspect {
+  id: string;
+  label: string;
 }
 
 export type AuraHue = "pink" | "coral" | "orange" | "peach" | "sage";
@@ -50,6 +57,7 @@ export interface Subject {
   totalWeeks: number;
   examDate?: string; // ISO — exam for courses, deadline for projects
   weeks: WeekProgress[];
+  customAspects?: CustomAspect[];
   pastPapers: PastPaper[];
   focusTopics: FocusTopic[];
   /** Project milestones replace lecture/homework/tutorial for kind === "project". */

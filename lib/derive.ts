@@ -1,5 +1,6 @@
 import { differenceInCalendarDays, format, subDays } from "date-fns";
-import type { Subject, StudySession, Status, SessionCategory } from "./types";
+import { customCategoryId } from "./categories";
+import type { Category, CustomSessionCategory, Subject, StudySession, Status, SessionCategory } from "./types";
 
 /* Derived data helpers — pure functions over store state. */
 
@@ -13,14 +14,16 @@ export interface TrackProgress {
 
 export function trackProgress(
   subject: Subject,
-  track: "lecture" | "homework" | "tutorial"
+  track: Category | CustomSessionCategory
 ): TrackProgress {
   const total = subject.weeks.length;
   let done = 0;
   let inProgress = 0;
+  const customId = customCategoryId(track);
   for (const w of subject.weeks) {
-    if (w[track] === "done") done++;
-    else if (w[track] === "in_progress") inProgress++;
+    const status = customId ? w.custom?.[customId] ?? "todo" : w[track as Category];
+    if (status === "done") done++;
+    else if (status === "in_progress") inProgress++;
   }
   return { done, inProgress, total };
 }

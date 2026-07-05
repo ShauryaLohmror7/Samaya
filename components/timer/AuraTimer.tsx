@@ -8,15 +8,8 @@ import { rollQuote } from "@/lib/quotes";
 import { TimerDigits } from "./TimerDigits";
 import { TimerPiP, type TimerPiPHandle } from "./TimerPiP";
 import { PillButton } from "@/components/ui/PillButton";
-import { AURA_HUE_VAR, type SessionCategory } from "@/lib/types";
-
-const CATEGORIES: { value: SessionCategory; label: string }[] = [
-  { value: "lecture", label: "Lecture" },
-  { value: "homework", label: "Homework" },
-  { value: "tutorial", label: "Tutorial" },
-  { value: "past_paper", label: "Past paper" },
-  { value: "general", label: "General" },
-];
+import { AURA_HUE_VAR } from "@/lib/types";
+import { categoryLabel, isWeeklyCategory, sessionCategoryOptions } from "@/lib/categories";
 
 function pad(n: number): string {
   return n.toString().padStart(2, "0");
@@ -113,9 +106,9 @@ export function AuraTimer() {
   }, [digits, running, timer.phase]);
 
   const subject = subjects.find((x) => x.id === timer.subjectId);
+  const categoryOptions = sessionCategoryOptions(subject);
   const canStart = timer.subjectId != null;
-  const weeklyCategory =
-    timer.category === "lecture" || timer.category === "homework" || timer.category === "tutorial";
+  const weeklyCategory = isWeeklyCategory(timer.category);
   const beginFocus = () => {
     startFocus();
     void pipRef.current?.open();
@@ -189,7 +182,7 @@ export function AuraTimer() {
                 style={{ background: AURA_HUE_VAR[subject.color] }}
               />
               {subject.code}
-              {timer.category ? ` · ${timer.category.replace("_", " ")}` : ""}
+              {timer.category ? ` · ${categoryLabel(timer.category, subject)}` : ""}
               {timer.weekRef && weeklyCategory ? ` · week ${timer.weekRef}` : ""}
               {" · "}
               {timer.focusMinutes}/{timer.breakMinutes}
@@ -222,7 +215,11 @@ export function AuraTimer() {
                     active={timer.subjectId === s.id}
                     aria-pressed={timer.subjectId === s.id}
                     onClick={() =>
-                      configureTimer({ subjectId: timer.subjectId === s.id ? null : s.id })
+                      configureTimer({
+                        subjectId: timer.subjectId === s.id ? null : s.id,
+                        category: null,
+                        weekRef: null,
+                      })
                     }
                   >
                     <span
@@ -244,7 +241,7 @@ export function AuraTimer() {
                   animate={{ opacity: 1, height: "auto" }}
                   className="flex flex-wrap items-center justify-center gap-2"
                 >
-                  {CATEGORIES.map((c) => (
+                  {categoryOptions.map((c) => (
                     <PillButton
                       key={c.value}
                       size="sm"
