@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
 import { AuraBloom } from "@/components/atmosphere/AuraBloom";
 import { CursorTrail } from "@/components/atmosphere/CursorTrail";
@@ -44,6 +45,7 @@ export default function RootLayout({
         className={`${fraunces.variable} ${grotesk.variable} ${jetbrains.variable} grain min-h-dvh`}
       >
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
+        <Analytics />
         <AuraBloom />
         <CursorTrail />
         <StoreHydrator />
