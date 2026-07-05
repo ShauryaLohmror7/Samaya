@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { AuraBloom } from "@/components/atmosphere/AuraBloom";
+import { CursorTrail } from "@/components/atmosphere/CursorTrail";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { StoreHydrator } from "@/components/StoreHydrator";
 
@@ -22,7 +23,7 @@ const jetbrains = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Aura — personal study platform",
+  title: "SAMAYA — personal study platform",
   description:
     "A local-first study tracker: per-subject weekly progress, the Aura focus timer, and end-of-day reflection.",
 };
@@ -44,6 +45,7 @@ export default function RootLayout({
       >
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <AuraBloom />
+        <CursorTrail />
         <StoreHydrator />
         <div className="relative" style={{ zIndex: 1 }}>
           <SiteNav />

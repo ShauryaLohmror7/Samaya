@@ -50,7 +50,10 @@
       "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --force-device-scale-factor=1 --hide-scrollbars --screenshot=/private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/atelier.png --window-size=1440,1500 --virtual-time-budget=9000 http://localhost:3111/log)",
       "Bash(sed 's|from \"./generators\"|from \"./generators.ts\"|; s|from \"./ramp\"|from \"./ramp.ts\"|; s|from \"@/lib/types\"|from \"./fake-types.ts\"|' lib/ascii/text.ts)",
       "Bash(node reveal-test.ts)",
-      "Bash(git commit -q -m 'feat: The Atelier — study-to-reveal procedural ASCII art + daily gallery *)"
+      "Bash(git commit -q -m 'feat: The Atelier — study-to-reveal procedural ASCII art + daily gallery *)",
+      "Bash(python3 -)",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --force-device-scale-factor=1 --hide-scrollbars --screenshot=/private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/samaya.png --window-size=1440,700 --virtual-time-budget=9000 http://localhost:3111)",
+      "Bash(git commit -q -m 'feat: SAMAYA royal wordmark + Matrix binary cursor trail *)"
     ]
   }
 }

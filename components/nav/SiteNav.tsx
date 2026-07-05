@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
+import { Wordmark } from "./Wordmark";
 
 const LINKS = [
   { href: "/", label: "Today" },
@@ -16,13 +17,7 @@ export function SiteNav() {
 
   return (
     <header className="mx-auto flex w-full max-w-6xl items-baseline justify-between px-5 pb-6 pt-6 sm:px-8 sm:pt-8">
-      <Link
-        href="/"
-        className="font-display text-2xl italic tracking-tight sm:text-3xl"
-        style={{ fontVariationSettings: "'opsz' 60, 'SOFT' 80" }}
-      >
-        Aura
-      </Link>
+      <Wordmark />
       <nav aria-label="Primary" className="flex items-baseline gap-4 sm:gap-7">
         {LINKS.map((link) => {
           const active =

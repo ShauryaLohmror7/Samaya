@@ -105,10 +105,10 @@ export function AuraTimer() {
   // document title mirrors the clock
   useEffect(() => {
     document.title = running
-      ? `${digits} · ${timer.phase === "break" ? "break" : "focus"} — Aura`
-      : "Aura — personal study platform";
+      ? `${digits} · ${timer.phase === "break" ? "break" : "focus"} — SAMAYA`
+      : "SAMAYA — personal study platform";
     return () => {
-      document.title = "Aura — personal study platform";
+      document.title = "SAMAYA — personal study platform";
     };
   }, [digits, running, timer.phase]);
 

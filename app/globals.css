@@ -167,6 +167,24 @@ body {
   border-top: 1px solid var(--line);
 }
 
+/* ——— SAMAYA wordmark: gold shimmer sweeping through royal blue ——— */
+
+.samaya-mark {
+  animation: samaya-shimmer 7s ease-in-out infinite;
+}
+.group:hover .samaya-mark {
+  animation-duration: 2s;
+}
+@keyframes samaya-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 /* ——— motion safety ——— */
 
 @media (prefers-reduced-motion: reduce) {
