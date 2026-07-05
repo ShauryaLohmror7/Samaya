@@ -88,7 +88,9 @@ html {
 body {
   background: var(--paper);
   color: var(--ink);
-  font-family: var(--font-sans);
+  /* next/font variables live on <body>, so reference them directly —
+     @theme inline does not emit runtime custom properties. */
+  font-family: var(--font-grotesk), "Space Grotesk", system-ui, sans-serif;
   font-feature-settings: "ss01" on;
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
@@ -108,7 +110,7 @@ body {
 /* ——— typographic utilities ——— */
 
 .font-display {
-  font-family: var(--font-display);
+  font-family: var(--font-fraunces), "Fraunces", Georgia, serif;
   font-variation-settings: "opsz" 144, "SOFT" 60, "WONK" 0;
 }
 
@@ -127,7 +129,7 @@ body {
 /* Vertical serif side-label, e.g. "aura timer" */
 .vertical-label {
   writing-mode: vertical-rl;
-  font-family: var(--font-display);
+  font-family: var(--font-fraunces), "Fraunces", Georgia, serif;
   font-style: italic;
   letter-spacing: 0.14em;
 }
@@ -138,7 +140,7 @@ body {
 
 /* Small technical caps label — the sans voice of the app */
 .microlabel {
-  font-family: var(--font-sans);
+  font-family: var(--font-grotesk), "Space Grotesk", system-ui, sans-serif;
   font-size: 0.6875rem;
   letter-spacing: 0.18em;
   text-transform: uppercase;

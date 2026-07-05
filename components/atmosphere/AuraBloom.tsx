@@ -3,6 +3,7 @@
 import { motion, useReducedMotion, AnimatePresence } from "motion/react";
 import { useAuraMood, resolveAurora, type AuraMood } from "@/lib/aura-mood";
 import { AURORAS } from "@/lib/aura-palettes";
+import { EtheralShadow } from "@/components/ui/etheral-shadow";
 
 /**
  * The signature element: a concentric aura bloom like the reference — a hot
@@ -41,6 +42,14 @@ export function AuraBloom() {
 
   return (
     <div aria-hidden className="fixed inset-0 overflow-hidden" style={{ zIndex: 0 }}>
+      {/* undulating ethereal wash (21st.dev component, aura-toned) behind the bloom */}
+      <div className="absolute inset-0" style={{ opacity: 0.28, filter: "blur(70px)" }}>
+        <EtheralShadow
+          color={colors[3]}
+          animation={{ scale: 55, speed: 22 }}
+          sizing="fill"
+        />
+      </div>
       <motion.div
         className="absolute inset-0"
         animate={reduceMotion ? { scale: 1 } : { scale: energy.pulse }}
