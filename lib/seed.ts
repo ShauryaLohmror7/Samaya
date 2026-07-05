@@ -93,5 +93,6 @@ export function defaultSettings(): Settings {
       { id: "preset-focus", name: "Focus", focusMinutes: 25, breakMinutes: 5 },
       { id: "preset-deep", name: "Deep Aura", focusMinutes: 50, breakMinutes: 10 },
     ],
+    dailyTargetMinutes: 240,
   };
 }

@@ -9,6 +9,7 @@ import { PageTitle } from "@/components/ui/PageTitle";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { PillButton } from "@/components/ui/PillButton";
 import { Heatmap } from "@/components/charts/Heatmap";
+import { DailyAtelier } from "@/components/ascii/DailyAtelier";
 import { AURA_HUE_VAR, type SessionCategory } from "@/lib/types";
 
 const CATS: (SessionCategory | "all")[] = ["all", "lecture", "homework", "tutorial", "past_paper", "general"];
@@ -47,6 +48,11 @@ export default function LogPage() {
   return (
     <div>
       <PageTitle outline="Log" italic="every honest minute" kicker="history" />
+
+      <SectionHeading kicker="study to reveal — every day mints a piece">
+        The Atelier
+      </SectionHeading>
+      <DailyAtelier />
 
       <SectionHeading kicker="semester at a glance">Study heat</SectionHeading>
       <Heatmap sessions={sessions} />

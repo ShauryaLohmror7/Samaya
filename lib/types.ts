@@ -1,5 +1,8 @@
 /** Domain types for Aura. Timestamps are ISO strings throughout. */
 
+import type { GeneratorId } from "./ascii/generators";
+import type { AuroraName } from "./aura-palettes";
+
 export type Category = "lecture" | "homework" | "tutorial";
 export type SessionCategory = Category | "past_paper" | "general";
 export type Status = "todo" | "in_progress" | "done";
@@ -65,6 +68,20 @@ export interface StudySession {
   note?: string;
 }
 
+/**
+ * The ASCII piece bound to a day. Assigned once the day has study; frozen
+ * (generator/seed/subject/target) at the moment it unlocks so later edits
+ * never rewrite an earned piece.
+ */
+export interface ArtDescriptor {
+  generator: GeneratorId;
+  seed: string;
+  subjectId?: string;
+  aurora: AuroraName;
+  unlockedAt?: string; // ISO — set when totalMinutes first crossed the target
+  targetMinutesAtUnlock?: number;
+}
+
 export interface DailyLog {
   date: string; // YYYY-MM-DD
   totalMinutes: number;
@@ -73,6 +90,7 @@ export interface DailyLog {
   aiReflection?: string;
   reflectionGeneratedAt?: string;
   mood?: 1 | 2 | 3 | 4 | 5;
+  art?: ArtDescriptor;
 }
 
 export interface TimerPreset {
@@ -89,12 +107,14 @@ export interface Settings {
   quotesEnabled: boolean;
   autoRepeat: boolean;
   presets: TimerPreset[];
+  /** Minutes of study that fully reveal the day's ASCII piece. */
+  dailyTargetMinutes: number;
 }
 
 /** Shape of the JSON export — the data-safety net. */
 export interface ExportBundle {
   app: "aura";
-  version: 1;
+  version: 1 | 2;
   exportedAt: string;
   subjects: Subject[];
   sessions: StudySession[];

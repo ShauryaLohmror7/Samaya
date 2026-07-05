@@ -35,7 +35,22 @@
       "Bash(lsof -nP -iTCP:3000 -sTCP:LISTEN)",
       "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --force-device-scale-factor=1 --hide-scrollbars --screenshot=/private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/home3.png --window-size=1440,2100 --virtual-time-budget=9000 http://localhost:3111)",
       "Bash(curl -s -o /dev/null -w \"/ -> %{http_code}\\\\n\" http://localhost:3111/)",
-      "Bash(git commit -q -m 'feat: local today analysis, inline exams editor, weeks stepper *)"
+      "Bash(git commit -q -m 'feat: local today analysis, inline exams editor, weeks stepper *)",
+      "Bash(node render-test.ts mandelbrot 20260705)",
+      "Bash(node render-test.ts solid3d 20260705)",
+      "Bash(sed 's|from \"./rng\"|from \"./rng.ts\"|' lib/ascii/generators.ts)",
+      "Bash(cp lib/ascii/rng.ts /private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/rng.ts)",
+      "Bash(cp lib/ascii/ramp.ts /private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/ramp.ts)",
+      "Bash(sed -i '' 's|/Users/shaur/StudyTrack/lib/ascii/generators.ts|./generators.ts|; s|/Users/shaur/StudyTrack/lib/ascii/ramp.ts|./ramp.ts|' /private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/render-test.ts)",
+      "Bash(echo \"exit=$?\")",
+      "Bash(node render-test.ts julia 7777)",
+      "Bash(sed 's|from \"./rng\"|from \"./rng.ts\"|; s|Math.pow\\(Math.max\\(0, smooth\\) / maxIter, 0.42\\)|Math.pow\\(Math.max\\(0, smooth\\) / maxIter, 0.9\\)|' lib/ascii/generators.ts)",
+      "Bash(curl -s -o /dev/null -w \"3000: %{http_code}\\\\n\" http://localhost:3000/)",
+      "Bash(curl -s -o /dev/null -w \"3111: %{http_code}\\\\n\" http://localhost:3111/)",
+      "Bash('/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' --headless --disable-gpu --force-device-scale-factor=1 --hide-scrollbars --screenshot=/private/tmp/claude-501/-Users-shaur-StudyTrack/6ba0973b-2a4e-478f-a96a-d25e59ecc0a0/scratchpad/atelier.png --window-size=1440,1500 --virtual-time-budget=9000 http://localhost:3111/log)",
+      "Bash(sed 's|from \"./generators\"|from \"./generators.ts\"|; s|from \"./ramp\"|from \"./ramp.ts\"|; s|from \"@/lib/types\"|from \"./fake-types.ts\"|' lib/ascii/text.ts)",
+      "Bash(node reveal-test.ts)",
+      "Bash(git commit -q -m 'feat: The Atelier — study-to-reveal procedural ASCII art + daily gallery *)"
     ]
   }
 }

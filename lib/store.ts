@@ -5,6 +5,7 @@ import { persist, createJSONStorage } from "zustand/middleware";
 import { format } from "date-fns";
 import { createIdbStorage } from "./storage";
 import { seedSubjects, defaultSettings } from "./seed";
+import { artForDay } from "./ascii/select";
 import type {
   Subject,
   StudySession,
@@ -119,6 +120,7 @@ interface AuraState {
 
   // settings
   updateSettings: (patch: Partial<Settings>) => void;
+  setDailyTarget: (minutes: number) => void;
   upsertPreset: (preset: TimerPreset) => void;
   deletePreset: (id: string) => void;
   setTheme: (theme: ThemeName) => void;
@@ -136,12 +138,14 @@ function todayKey(iso?: string): string {
 function rebuildDailyLog(
   logs: Record<string, DailyLog>,
   sessions: StudySession[],
-  date: string
+  date: string,
+  subjects: Subject[],
+  targetMinutes: number
 ): Record<string, DailyLog> {
   const daySessions = sessions.filter((s) => todayKey(s.startedAt) === date);
   const existing = logs[date];
   if (daySessions.length === 0) {
-    if (!existing?.aiReflection && !existing?.mood) {
+    if (!existing?.aiReflection && !existing?.mood && !existing?.art?.unlockedAt) {
       const { [date]: _removed, ...rest } = logs;
       return rest;
     }
@@ -150,11 +154,21 @@ function rebuildDailyLog(
       [date]: { ...existing, totalMinutes: 0, subjectsTouched: [], sessionIds: [] },
     };
   }
+
+  const totalMinutes = daySessions.reduce((a, s) => a + s.durationMinutes, 0);
+
+  // Art: track the dominant subject until unlocked, then freeze it forever.
+  let art = existing?.art;
+  if (!art?.unlockedAt) art = artForDay(date, sessions, subjects);
+  if (art && !art.unlockedAt && targetMinutes > 0 && totalMinutes >= targetMinutes) {
+    art = { ...art, unlockedAt: new Date().toISOString(), targetMinutesAtUnlock: targetMinutes };
+  }
+
   return {
     ...logs,
     [date]: {
       date,
-      totalMinutes: daySessions.reduce((a, s) => a + s.durationMinutes, 0),
+      totalMinutes,
       subjectsTouched: [...new Set(daySessions.map((s) => s.subjectId))],
       sessionIds: daySessions.map((s) => s.id),
       ...(existing?.aiReflection ? { aiReflection: existing.aiReflection } : {}),
@@ -162,6 +176,7 @@ function rebuildDailyLog(
         ? { reflectionGeneratedAt: existing.reflectionGeneratedAt }
         : {}),
       ...(existing?.mood ? { mood: existing.mood } : {}),
+      ...(art ? { art } : {}),
     },
   };
 }
@@ -346,7 +361,13 @@ export const useAura = create<AuraState>()(
           const sessions = [...s.sessions, session];
           return {
             sessions,
-            dailyLogs: rebuildDailyLog(s.dailyLogs, sessions, todayKey(session.startedAt)),
+            dailyLogs: rebuildDailyLog(
+              s.dailyLogs,
+              sessions,
+              todayKey(session.startedAt),
+              s.subjects,
+              s.settings.dailyTargetMinutes
+            ),
           };
         });
       },
@@ -358,7 +379,13 @@ export const useAura = create<AuraState>()(
           return {
             sessions,
             dailyLogs: victim
-              ? rebuildDailyLog(s.dailyLogs, sessions, todayKey(victim.startedAt))
+              ? rebuildDailyLog(
+                  s.dailyLogs,
+                  sessions,
+                  todayKey(victim.startedAt),
+                  s.subjects,
+                  s.settings.dailyTargetMinutes
+                )
               : s.dailyLogs,
           };
         }),
@@ -515,6 +542,18 @@ export const useAura = create<AuraState>()(
 
       updateSettings: (patch) => set((s) => ({ settings: { ...s.settings, ...patch } })),
 
+      setDailyTarget: (minutes) =>
+        set((s) => {
+          const target = Math.max(0, Math.round(minutes));
+          // Re-evaluate every studied day so a newly-met target mints its art.
+          // Frozen unlocks are never undone, so lowering then raising is safe.
+          let dailyLogs = s.dailyLogs;
+          for (const d of new Set(s.sessions.map((x) => todayKey(x.startedAt)))) {
+            dailyLogs = rebuildDailyLog(dailyLogs, s.sessions, d, s.subjects, target);
+          }
+          return { settings: { ...s.settings, dailyTargetMinutes: target }, dailyLogs };
+        }),
+
       upsertPreset: (preset) =>
         set((s) => {
           const exists = s.settings.presets.some((p) => p.id === preset.id);
@@ -551,7 +590,7 @@ export const useAura = create<AuraState>()(
         const s = get();
         return {
           app: "aura",
-          version: 1,
+          version: 2,
           exportedAt: new Date().toISOString(),
           subjects: s.subjects,
           sessions: s.sessions,
@@ -579,16 +618,20 @@ export const useAura = create<AuraState>()(
     }),
     {
       name: "aura-store",
-      version: 2,
+      version: 3,
       migrate: (persisted) => {
-        // v1 → v2: subjects gained a per-page `aurora` palette.
         const state = persisted as Partial<AuraState>;
+        // v1 → v2: subjects gained a per-page `aurora` palette.
         const palettes = ["lagoon", "polar", "meadow", "orchid", "glacier"] as const;
         if (Array.isArray(state.subjects)) {
           state.subjects = state.subjects.map((s, i) => ({
             ...s,
             aurora: s.aurora ?? palettes[i % palettes.length]!,
           }));
+        }
+        // v2 → v3: the Atelier added a daily reveal target.
+        if (state.settings && state.settings.dailyTargetMinutes == null) {
+          state.settings = { ...state.settings, dailyTargetMinutes: 240 };
         }
         return state as AuraState;
       },

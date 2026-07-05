@@ -12,7 +12,7 @@ import { Field, TextInput, NumberInput } from "@/components/ui/inputs";
 
 export default function SettingsPage() {
   const settings = useAura((s) => s.settings);
-  const { setTheme, updateSettings, upsertPreset, deletePreset, exportData, importData } = useAura();
+  const { setTheme, updateSettings, setDailyTarget, upsertPreset, deletePreset, exportData, importData } = useAura();
   const fileRef = useRef<HTMLInputElement>(null);
   const [importMsg, setImportMsg] = useState<string | null>(null);
   const [newName, setNewName] = useState("");
@@ -72,6 +72,45 @@ export default function SettingsPage() {
         <span className="font-display italic" style={{ color: "var(--ink-soft)" }}>
           {night ? "night — the aura glows in the dark" : "day — warm paper"}
         </span>
+      </div>
+
+      {/* daily target — powers the Atelier reveal */}
+      <SectionHeading kicker="the Atelier — study this much to reveal the day's piece">
+        Daily target
+      </SectionHeading>
+      <div className="flex max-w-md items-end gap-4">
+        <div className="w-20">
+          <Field label="Hours">
+            <NumberInput
+              min={0}
+              max={16}
+              value={Math.floor(settings.dailyTargetMinutes / 60)}
+              onChange={(e) =>
+                setDailyTarget(
+                  Math.max(0, Number(e.target.value) || 0) * 60 + (settings.dailyTargetMinutes % 60)
+                )
+              }
+            />
+          </Field>
+        </div>
+        <div className="w-20">
+          <Field label="Minutes">
+            <NumberInput
+              min={0}
+              max={59}
+              value={settings.dailyTargetMinutes % 60}
+              onChange={(e) =>
+                setDailyTarget(
+                  Math.floor(settings.dailyTargetMinutes / 60) * 60 +
+                    Math.min(59, Math.max(0, Number(e.target.value) || 0))
+                )
+              }
+            />
+          </Field>
+        </div>
+        <p className="pb-1 text-xs" style={{ color: "var(--ink-faint)" }}>
+          Pieces already unlocked stay unlocked — raising the bar only affects new days.
+        </p>
       </div>
 
       {/* quotes */}
