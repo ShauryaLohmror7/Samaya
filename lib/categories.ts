@@ -1,6 +1,8 @@
-import type { Category, SessionCategory, Subject } from "./types";
+import type { Category, CustomSessionCategory, SessionCategory, Subject } from "./types";
 
-export const BUILTIN_TRACKS: { key: Category; label: string }[] = [
+export type WeeklyTrack = { key: Category | CustomSessionCategory; label: string };
+
+export const BUILTIN_TRACKS: WeeklyTrack[] = [
   { key: "lecture", label: "Lecture" },
   { key: "homework", label: "Homework" },
   { key: "tutorial", label: "Tutorial" },
@@ -31,6 +33,16 @@ export function isWeeklyCategory(category: SessionCategory | null | undefined): 
     category === "tutorial" ||
     customCategoryId(category) != null
   );
+}
+
+export function subjectWeeklyTracks(subject: Subject): WeeklyTrack[] {
+  return [
+    ...BUILTIN_TRACKS,
+    ...(subject.customAspects ?? []).map((aspect) => ({
+      key: customCategory(aspect.id),
+      label: aspect.label,
+    })),
+  ];
 }
 
 export function categoryLabel(category: SessionCategory | null | undefined, subject?: Subject): string {

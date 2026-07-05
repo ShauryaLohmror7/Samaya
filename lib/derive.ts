@@ -1,6 +1,6 @@
 import { differenceInCalendarDays, format, subDays } from "date-fns";
-import { customCategoryId } from "./categories";
-import type { Category, CustomSessionCategory, Subject, StudySession, Status, SessionCategory } from "./types";
+import { customCategoryId, subjectWeeklyTracks } from "./categories";
+import type { Category, CustomSessionCategory, Subject, StudySession, Status, SessionCategory, WeekProgress } from "./types";
 
 /* Derived data helpers — pure functions over store state. */
 
@@ -28,10 +28,17 @@ export function trackProgress(
   return { done, inProgress, total };
 }
 
+function weekStatusForTrack(week: WeekProgress, track: Category | CustomSessionCategory): Status {
+  const customId = customCategoryId(track);
+  return customId ? week.custom?.[customId] ?? "todo" : week[track as Category];
+}
+
 /**
  * Weighted composite completion for a subject.
- * Exam courses: weekly tracks 70% (lecture 30, homework 20, tutorial 20)
- * + past papers 30%. If no past papers exist yet, weekly tracks are 100%.
+ * Exam courses: weekly tracks 70% + past papers 30%.
+ * Built-in rows keep their original 30/20/20 shape; custom rows join that
+ * weekly score so the subject percentage follows every visible grid row.
+ * If no past papers exist yet, weekly tracks are 100%.
  * Projects: milestones 80% + weeks-as-log 20% (milestones are the real work).
  */
 export function subjectCompletion(subject: Subject): number {
@@ -53,13 +60,18 @@ export function subjectCompletion(subject: Subject): number {
 function weeklyScore(subject: Subject): number {
   if (subject.weeks.length === 0) return 0;
   const weights = { lecture: 0.3, homework: 0.2, tutorial: 0.2 } as const;
-  const totalWeight = 0.7;
+  const customTracks = subjectWeeklyTracks(subject).filter((track) => customCategoryId(track.key));
+  const customWeight = 0.2;
+  const totalWeight = 0.7 + customTracks.length * customWeight;
   let acc = 0;
   for (const w of subject.weeks) {
     acc +=
       statusValue[w.lecture] * weights.lecture +
       statusValue[w.homework] * weights.homework +
       statusValue[w.tutorial] * weights.tutorial;
+    for (const track of customTracks) {
+      acc += statusValue[weekStatusForTrack(w, track.key)] * customWeight;
+    }
   }
   return acc / (subject.weeks.length * totalWeight);
 }
@@ -138,15 +150,15 @@ export function outstandingWork(subjects: Subject[], now = new Date()): Outstand
   for (const subj of subjects.filter((s) => !s.archived)) {
     const days = subj.examDate ? Math.max(0, daysUntil(subj.examDate, now)) : 60;
     const proximity = 1 / Math.max(1, days); // closer exam → heavier
-    for (const track of ["lecture", "homework", "tutorial"] as const) {
+    for (const track of subjectWeeklyTracks(subj)) {
       if (subj.kind === "project") continue;
-      const p = trackProgress(subj, track);
+      const p = trackProgress(subj, track.key);
       const remaining = p.total - p.done;
       if (remaining > 0) {
         items.push({
           subjectId: subj.id,
           subjectCode: subj.code,
-          description: `${track} review: ${remaining} of ${p.total} weeks open`,
+          description: `${track.label.toLowerCase()} review: ${remaining} of ${p.total} weeks open`,
           urgency: remaining * proximity,
         });
       }

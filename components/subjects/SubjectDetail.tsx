@@ -13,7 +13,7 @@ import {
   daysUntil,
   formatMinutes,
 } from "@/lib/derive";
-import { BUILTIN_TRACKS, categoryLabel, sessionCategoryOptions } from "@/lib/categories";
+import { categoryLabel, sessionCategoryOptions, subjectWeeklyTracks } from "@/lib/categories";
 import { SceneAura } from "@/components/atmosphere/SceneAura";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { ProgressRing } from "@/components/ui/ProgressRing";
@@ -291,7 +291,7 @@ export function SubjectDetail({ id }: { id: string }) {
             right={
               <span className="flex items-center gap-4">
                 <span className="font-mono text-xs" style={{ color: "var(--ink-soft)" }}>
-                  {BUILTIN_TRACKS
+                  {subjectWeeklyTracks(subject)
                     .map((t) => `${t.label[0]} ${trackProgress(subject, t.key).done}/${subject.totalWeeks}`)
                     .join(" · ")}
                 </span>

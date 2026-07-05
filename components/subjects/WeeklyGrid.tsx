@@ -3,8 +3,8 @@
 import { motion } from "motion/react";
 import { useAura } from "@/lib/store";
 import { trackProgress } from "@/lib/derive";
-import { BUILTIN_TRACKS, customCategory, customCategoryId } from "@/lib/categories";
-import { AURA_HUE_VAR, type Category, type CustomSessionCategory, type SessionCategory, type Status, type Subject } from "@/lib/types";
+import { customCategoryId, subjectWeeklyTracks } from "@/lib/categories";
+import { AURA_HUE_VAR, type Category, type CustomSessionCategory, type Status, type Subject } from "@/lib/types";
 
 const NEXT: Record<Status, string> = {
   todo: "mark in progress",
@@ -18,14 +18,9 @@ const NEXT: Record<Status, string> = {
  */
 export function WeeklyGrid({ subject }: { subject: Subject }) {
   const cycleWeekStatus = useAura((s) => s.cycleWeekStatus);
+  const deleteCustomAspect = useAura((s) => s.deleteCustomAspect);
   const hue = AURA_HUE_VAR[subject.color];
-  const tracks: { key: SessionCategory; label: string }[] = [
-    ...BUILTIN_TRACKS,
-    ...(subject.customAspects ?? []).map((aspect) => ({
-      key: customCategory(aspect.id),
-      label: aspect.label,
-    })),
-  ];
+  const tracks = subjectWeeklyTracks(subject);
 
   return (
     <div className="overflow-x-auto pb-2" role="grid" aria-label="Weekly review grid">
@@ -46,14 +41,31 @@ export function WeeklyGrid({ subject }: { subject: Subject }) {
         <tbody>
           {tracks.map((track) => {
             const p = trackProgress(subject, track.key as Category | CustomSessionCategory);
+            const trackCustomId = customCategoryId(track.key);
             return (
               <tr key={track.key}>
                 <td className="sticky left-0 z-10 whitespace-nowrap pr-4 text-xs uppercase tracking-[0.14em]" style={{ color: "var(--ink-soft)", background: "transparent" }}>
-                  {track.label}
+                  <span className="flex items-center gap-2">
+                    <span>{track.label}</span>
+                    {trackCustomId && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          if (confirm(`Delete "${track.label}" from ${subject.code}? Logged sessions for it will move to General.`)) {
+                            deleteCustomAspect(subject.id, trackCustomId);
+                          }
+                        }}
+                        aria-label={`Delete ${track.label}`}
+                        className="font-mono text-xs opacity-45 transition-opacity hover:opacity-100"
+                        style={{ color: "var(--ink)" }}
+                      >
+                        x
+                      </button>
+                    )}
+                  </span>
                 </td>
                 {subject.weeks.map((w) => {
-                  const customId = customCategoryId(track.key);
-                  const status = customId ? w.custom?.[customId] ?? "todo" : w[track.key as Category];
+                  const status = trackCustomId ? w.custom?.[trackCustomId] ?? "todo" : w[track.key as Category];
                   return (
                     <td key={w.week} className="px-1 text-center">
                       <motion.button
