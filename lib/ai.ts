@@ -1,5 +1,9 @@
-/** Single swappable model constant for the reflection feature. */
-export const REFLECTION_MODEL = "claude-sonnet-5";
+/**
+ * Single swappable model constant for the reflection feature.
+ * Google Gemini Flash — available on Google AI Studio's free tier
+ * (aistudio.google.com). Swap for any generateContent-capable model.
+ */
+export const REFLECTION_MODEL = "gemini-2.5-flash";
 
 /** Payload the client sends to /api/reflect — already aggregated on-device. */
 export interface ReflectRequest {

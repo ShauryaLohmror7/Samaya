@@ -21,13 +21,13 @@ Every subject page has its own moving aurora — cool turquoise, polar blue, mea
 
 ## Stack
 
-Next.js (App Router) · TypeScript (strict) · Tailwind CSS v4 · [`motion`](https://motion.dev) · Zustand + IndexedDB (`idb-keyval`) · `@anthropic-ai/sdk` · `date-fns` · hand-built SVG charts
+Next.js (App Router) · TypeScript (strict) · Tailwind CSS v4 · [`motion`](https://motion.dev) · Zustand + IndexedDB (`idb-keyval`) · Google Gemini (free tier, for reflections) · `date-fns` · hand-built SVG charts
 
 ## Run it
 
 ```bash
 npm install
-cp .env.example .env.local   # optional: add ANTHROPIC_API_KEY for reflections
+cp .env.example .env.local   # optional: add a free GEMINI_API_KEY for reflections
 npm run dev
 ```
 

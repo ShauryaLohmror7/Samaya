@@ -172,7 +172,7 @@ export default function ReflectPage() {
           >
             <p className="text-sm">{error}</p>
             <p className="mt-1 text-xs" style={{ color: "var(--ink-soft)" }}>
-              Everything else keeps working — reflections just need an <code className="font-mono">ANTHROPIC_API_KEY</code> in <code className="font-mono">.env.local</code>.
+              Everything else keeps working — reflections just need a free <code className="font-mono">GEMINI_API_KEY</code> (from aistudio.google.com) in <code className="font-mono">.env.local</code>.
             </p>
           </motion.div>
         )}

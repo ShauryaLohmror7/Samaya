@@ -1,10 +1,16 @@
-import Anthropic from "@anthropic-ai/sdk";
 import { NextResponse } from "next/server";
 import { REFLECTION_MODEL, type ReflectRequest } from "@/lib/ai";
 
 export const runtime = "nodejs";
 
-const SYSTEM = `You are the end-of-day reflection voice of "Aura", a personal study tracker used by a TUM Informatik student during exam season. You receive a JSON summary of today's studying: real logged sessions, total minutes, which subjects were touched, outstanding work (weighted by exam proximity), and days left until each exam.
+/**
+ * End-of-day reflection via Google Gemini (free tier — get a key at
+ * https://aistudio.google.com). Called from the client, key stays server-side.
+ * We hit the REST generateContent endpoint directly with fetch so there's no
+ * SDK dependency and nothing provider-specific to keep in sync.
+ */
+
+const SYSTEM = `You are the end-of-day reflection voice of "SAMAYA", a personal study tracker used by a TUM Informatik student during exam season. You receive a JSON summary of today's studying: real logged sessions, total minutes, which subjects were touched, outstanding work (weighted by exam proximity), and days left until each exam.
 
 Write a short reflection with exactly these three parts, in this order, using markdown:
 
@@ -16,11 +22,20 @@ Write a short reflection with exactly these three parts, in this order, using ma
 
 Rules: no empty hype, no "you've got this!", no emoji. Total under 220 words. Address the student as "you".`;
 
+interface GeminiResponse {
+  candidates?: {
+    content?: { parts?: { text?: string }[] };
+    finishReason?: string;
+  }[];
+  promptFeedback?: { blockReason?: string };
+  error?: { message?: string };
+}
+
 export async function POST(request: Request) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     return NextResponse.json(
-      { error: "missing_key", message: "ANTHROPIC_API_KEY is not set — add it to .env.local." },
+      { error: "missing_key", message: "GEMINI_API_KEY is not set — add it to .env.local." },
       { status: 503 }
     );
   }
@@ -33,29 +48,52 @@ export async function POST(request: Request) {
   }
 
   try {
-    const client = new Anthropic({ apiKey });
-    const message = await client.messages.create({
-      model: REFLECTION_MODEL,
-      max_tokens: 600,
-      system: SYSTEM,
-      messages: [
-        {
-          role: "user",
-          content: `Today's study summary:\n${JSON.stringify(body, null, 2)}`,
-        },
-      ],
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${REFLECTION_MODEL}:generateContent`;
+    const res = await fetch(url, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
+      body: JSON.stringify({
+        systemInstruction: { parts: [{ text: SYSTEM }] },
+        contents: [
+          {
+            role: "user",
+            parts: [{ text: `Today's study summary:\n${JSON.stringify(body, null, 2)}` }],
+          },
+        ],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 800 },
+      }),
     });
 
-    const text = message.content
-      .filter((block): block is Anthropic.TextBlock => block.type === "text")
-      .map((block) => block.text)
-      .join("\n")
+    const data = (await res.json()) as GeminiResponse;
+
+    if (!res.ok) {
+      console.error("[reflect] Gemini error:", data.error?.message ?? res.statusText);
+      return NextResponse.json(
+        { error: "api_error", message: "The reflection service is unavailable right now." },
+        { status: 502 }
+      );
+    }
+
+    const text = (data.candidates?.[0]?.content?.parts ?? [])
+      .map((p) => p.text ?? "")
+      .join("")
       .trim();
 
-    if (!text) throw new Error("Empty response");
+    if (!text) {
+      const blocked = data.promptFeedback?.blockReason;
+      console.error("[reflect] Empty Gemini response", blocked ? `(blocked: ${blocked})` : "");
+      return NextResponse.json(
+        { error: "api_error", message: "The reflection came back empty — try again." },
+        { status: 502 }
+      );
+    }
+
     return NextResponse.json({ reflection: text });
   } catch (err) {
-    console.error("[reflect] Anthropic call failed:", err);
+    console.error("[reflect] Gemini call failed:", err);
     return NextResponse.json(
       { error: "api_error", message: "The reflection service is unavailable right now." },
       { status: 502 }
