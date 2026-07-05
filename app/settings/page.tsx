@@ -6,6 +6,7 @@ import { format } from "date-fns";
 import { useAura, newId } from "@/lib/store";
 import type { ExportBundle } from "@/lib/types";
 import { PageTitle } from "@/components/ui/PageTitle";
+import { THEMES, DARK_THEMES } from "@/lib/themes";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { PillButton } from "@/components/ui/PillButton";
 import { Field, TextInput, NumberInput } from "@/components/ui/inputs";
@@ -18,8 +19,6 @@ export default function SettingsPage() {
   const [newName, setNewName] = useState("");
   const [newFocus, setNewFocus] = useState(25);
   const [newBreak, setNewBreak] = useState(5);
-
-  const night = settings.theme === "night";
 
   const doExport = () => {
     const bundle = exportData();
@@ -47,31 +46,113 @@ export default function SettingsPage() {
       <PageTitle outline="Settings" italic="make it yours" kicker="aura" />
 
       {/* theme */}
-      <SectionHeading kicker="day / night">Theme</SectionHeading>
-      <div className="flex items-center gap-4">
-        <button
-          role="switch"
-          aria-checked={night}
-          aria-label="Night theme"
-          onClick={() => setTheme(night ? "day" : "night")}
-          className="relative h-9 w-[4.25rem] rounded-full"
-          style={{ border: "1.5px solid var(--ink)" }}
-        >
-          <motion.span
-            layout
-            transition={{ type: "spring", stiffness: 500, damping: 30 }}
-            className="absolute top-1 h-6 w-6 rounded-full"
-            style={{
-              left: night ? "calc(100% - 1.75rem)" : "0.25rem",
-              background: night
-                ? "radial-gradient(circle at 35% 35%, var(--aura-peach), var(--aura-orange))"
-                : "radial-gradient(circle at 35% 35%, var(--aura-orange), var(--aura-coral))",
-            }}
+      <SectionHeading kicker="nine papers, nine weathers">Theme</SectionHeading>
+      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3" role="radiogroup" aria-label="Theme">
+        {THEMES.map((t) => {
+          const active = settings.theme === t.id;
+          return (
+            <motion.button
+              key={t.id}
+              role="radio"
+              aria-checked={active}
+              onClick={() => setTheme(t.id)}
+              whileHover={{ y: -3, scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              transition={{ type: "spring", stiffness: 400, damping: 24 }}
+              className="relative overflow-hidden rounded-2xl px-4 py-4 text-left"
+              style={{
+                background: t.swatch.paper,
+                border: active ? "2px solid var(--ink)" : "1px solid var(--line-strong)",
+                boxShadow: active ? "var(--shadow-soft)" : undefined,
+              }}
+            >
+              <span
+                className="font-display block text-base italic"
+                style={{ color: t.swatch.ink, fontVariationSettings: "'opsz' 100, 'SOFT' 80" }}
+              >
+                {t.label}
+              </span>
+              <span className="mt-2 flex items-center gap-1.5">
+                {t.swatch.accents.map((c, i) => (
+                  <span
+                    key={i}
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ background: c, boxShadow: `0 0 6px ${c}66` }}
+                  />
+                ))}
+                <span
+                  className="ml-auto text-[0.6rem] uppercase tracking-[0.14em]"
+                  style={{ color: t.swatch.ink, opacity: 0.55 }}
+                >
+                  {t.family}
+                </span>
+              </span>
+              {active && (
+                <motion.span
+                  layoutId="theme-check"
+                  className="absolute right-3 top-3 flex h-5 w-5 items-center justify-center rounded-full text-[0.65rem]"
+                  style={{ background: t.swatch.ink, color: t.swatch.paper }}
+                >
+                  ✓
+                </motion.span>
+              )}
+            </motion.button>
+          );
+        })}
+      </div>
+
+      {/* auto day/night */}
+      <div className="mt-6 flex flex-col gap-3">
+        <label className="flex cursor-pointer items-center gap-3">
+          <input
+            type="checkbox"
+            checked={settings.autoTheme}
+            onChange={(e) => updateSettings({ autoTheme: e.target.checked })}
+            className="h-4 w-4 accent-current"
           />
-        </button>
-        <span className="font-display italic" style={{ color: "var(--ink-soft)" }}>
-          {night ? "night — the aura glows in the dark" : "day — warm paper"}
-        </span>
+          <span className="text-sm">
+            Auto night shift — switch to a dark theme from 20:00 to 07:00
+          </span>
+        </label>
+        {settings.autoTheme && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            className="flex flex-wrap items-center gap-2 pl-7"
+          >
+            <span className="microlabel">evenings use</span>
+            {DARK_THEMES.map((t) => (
+              <PillButton
+                key={t.id}
+                size="sm"
+                active={settings.nightTheme === t.id}
+                onClick={() => updateSettings({ nightTheme: t.id })}
+              >
+                {t.label}
+              </PillButton>
+            ))}
+          </motion.div>
+        )}
+      </div>
+
+      {/* aura intensity */}
+      <div className="mt-6 max-w-md">
+        <div className="mb-1.5 flex items-baseline justify-between">
+          <span className="microlabel">background intensity</span>
+          <span className="font-mono text-xs tabular" style={{ color: "var(--ink-soft)" }}>
+            {Math.round((settings.auraIntensity ?? 1) * 100)}%
+          </span>
+        </div>
+        <input
+          type="range"
+          min={20}
+          max={130}
+          step={5}
+          value={Math.round((settings.auraIntensity ?? 1) * 100)}
+          onChange={(e) => updateSettings({ auraIntensity: Number(e.target.value) / 100 })}
+          aria-label="Background atmosphere intensity"
+          className="w-full accent-current"
+        />
       </div>
 
       {/* daily target — powers the Atelier reveal */}

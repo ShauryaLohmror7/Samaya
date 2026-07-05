@@ -108,7 +108,16 @@ export interface TimerPreset {
   breakMinutes: number;
 }
 
-export type ThemeName = "day" | "night";
+export type ThemeName =
+  | "day"
+  | "night"
+  | "sakura"
+  | "matcha"
+  | "blueprint"
+  | "manuscript"
+  | "royal"
+  | "ultraviolet"
+  | "terminal";
 
 export interface Settings {
   theme: ThemeName;
@@ -117,6 +126,12 @@ export interface Settings {
   presets: TimerPreset[];
   /** Minutes of study that fully reveal the day's ASCII piece. */
   dailyTargetMinutes: number;
+  /** Switch to `nightTheme` automatically between 20:00 and 07:00. */
+  autoTheme: boolean;
+  /** Which dark theme evenings use when autoTheme is on. */
+  nightTheme: ThemeName;
+  /** Multiplier on background atmosphere strength (0.2–1.3). */
+  auraIntensity: number;
 }
 
 /** Shape of the JSON export — the data-safety net. */

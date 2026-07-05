@@ -681,7 +681,7 @@ export const useAura = create<AuraState>()(
     }),
     {
       name: "aura-store",
-      version: 3,
+      version: 4,
       migrate: (persisted) => {
         const state = persisted as Partial<AuraState>;
         // v1 → v2: subjects gained a per-page `aurora` palette.
@@ -703,6 +703,15 @@ export const useAura = create<AuraState>()(
         // v2 → v3: the Atelier added a daily reveal target.
         if (state.settings && state.settings.dailyTargetMinutes == null) {
           state.settings = { ...state.settings, dailyTargetMinutes: 240 };
+        }
+        // v3 → v4: the theme system grew — auto day/night + intensity.
+        if (state.settings && state.settings.autoTheme == null) {
+          state.settings = {
+            ...state.settings,
+            autoTheme: false,
+            nightTheme: "night",
+            auraIntensity: 1,
+          };
         }
         return state as AuraState;
       },

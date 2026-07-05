@@ -26,7 +26,7 @@ const RINGS = [
 
 // Motion energy per mood: idle drifts glacially, focus breathes, break slows.
 const ENERGY: Record<AuraMood, { pulse: number[]; pulseDur: number; driftDur: number; driftAmp: number }> = {
-  idle: { pulse: [1], pulseDur: 1, driftDur: 30, driftAmp: 26 },
+  idle: { pulse: [1, 1.02, 1], pulseDur: 9, driftDur: 22, driftAmp: 38 },
   focus: { pulse: [1, 1.05, 1], pulseDur: 4.4, driftDur: 14, driftAmp: 18 },
   break: { pulse: [1, 1.02, 1], pulseDur: 7, driftDur: 38, driftAmp: 20 },
 };
@@ -54,7 +54,7 @@ export function AuraBloom() {
         className="absolute inset-0"
         animate={reduceMotion ? { scale: 1 } : { scale: energy.pulse }}
         transition={{ duration: energy.pulseDur, repeat: Infinity, ease: "easeInOut" }}
-        style={{ filter: "blur(44px) saturate(1.3)", opacity: "var(--aura-opacity)" }}
+        style={{ filter: "blur(44px) saturate(1.3)", opacity: "calc(var(--aura-opacity) * var(--aura-user, 1))" }}
       >
         <AnimatePresence mode="sync">
           <motion.div

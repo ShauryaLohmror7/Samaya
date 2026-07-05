@@ -94,5 +94,8 @@ export function defaultSettings(): Settings {
       { id: "preset-deep", name: "Deep Aura", focusMinutes: 50, breakMinutes: 10 },
     ],
     dailyTargetMinutes: 240,
+    autoTheme: false,
+    nightTheme: "night",
+    auraIntensity: 1,
   };
 }

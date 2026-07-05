@@ -56,6 +56,160 @@
   color-scheme: dark;
 }
 
+/* ——— Sakura: blush paper, plum ink, blossom pinks ——— */
+[data-theme="sakura"] {
+  --paper: #f9edf0;
+  --paper-raised: #fdf4f6;
+  --paper-sunken: #f3e2e7;
+  --ink: #3b1a26;
+  --ink-soft: rgba(59, 26, 38, 0.64);
+  --ink-faint: rgba(59, 26, 38, 0.4);
+  --line: rgba(59, 26, 38, 0.14);
+  --line-strong: rgba(59, 26, 38, 0.32);
+  --aura-pink: #e88fb0;
+  --aura-coral: #ef9d9d;
+  --aura-orange: #d64d7a;
+  --aura-peach: #f3c6d2;
+  --sage: #8aa88f;
+  --sage-deep: #67876d;
+  --aura-opacity: 0.9;
+  --grain-opacity: 0.045;
+  --shadow-soft: 0 2px 24px rgba(59, 26, 38, 0.08);
+  color-scheme: light;
+}
+
+/* ——— Matcha: sage paper, forest ink, leaf greens ——— */
+[data-theme="matcha"] {
+  --paper: #edf0e2;
+  --paper-raised: #f4f6ec;
+  --paper-sunken: #e3e8d3;
+  --ink: #1f2a18;
+  --ink-soft: rgba(31, 42, 24, 0.64);
+  --ink-faint: rgba(31, 42, 24, 0.4);
+  --line: rgba(31, 42, 24, 0.14);
+  --line-strong: rgba(31, 42, 24, 0.32);
+  --aura-pink: #a8c686;
+  --aura-coral: #7ba05b;
+  --aura-orange: #d9b64a;
+  --aura-peach: #d9e4bd;
+  --sage: #5f8b6c;
+  --sage-deep: #46705a;
+  --aura-opacity: 0.9;
+  --grain-opacity: 0.05;
+  --shadow-soft: 0 2px 24px rgba(31, 42, 24, 0.08);
+  color-scheme: light;
+}
+
+/* ——— Blueprint: drafting-table blue-grey, navy ink ——— */
+[data-theme="blueprint"] {
+  --paper: #e8edf3;
+  --paper-raised: #f1f4f8;
+  --paper-sunken: #dde4ee;
+  --ink: #12233d;
+  --ink-soft: rgba(18, 35, 61, 0.66);
+  --ink-faint: rgba(18, 35, 61, 0.42);
+  --line: rgba(18, 35, 61, 0.15);
+  --line-strong: rgba(18, 35, 61, 0.34);
+  --aura-pink: #7fa6d6;
+  --aura-coral: #3e6fb0;
+  --aura-orange: #2b4a76;
+  --aura-peach: #b9cde8;
+  --sage: #4d8b8b;
+  --sage-deep: #376d6d;
+  --aura-opacity: 0.85;
+  --grain-opacity: 0.04;
+  --shadow-soft: 0 2px 24px rgba(18, 35, 61, 0.1);
+  color-scheme: light;
+}
+
+/* ——— Manuscript: amber library paper, sepia ink, candle gold ——— */
+[data-theme="manuscript"] {
+  --paper: #f2e6cd;
+  --paper-raised: #f8efdc;
+  --paper-sunken: #e9dab9;
+  --ink: #2e1f0e;
+  --ink-soft: rgba(46, 31, 14, 0.66);
+  --ink-faint: rgba(46, 31, 14, 0.42);
+  --line: rgba(46, 31, 14, 0.16);
+  --line-strong: rgba(46, 31, 14, 0.34);
+  --aura-pink: #e5b45c;
+  --aura-coral: #c98a2d;
+  --aura-orange: #8a5a22;
+  --aura-peach: #efd7a4;
+  --sage: #7d9169;
+  --sage-deep: #5f7450;
+  --aura-opacity: 0.9;
+  --grain-opacity: 0.075;
+  --shadow-soft: 0 2px 24px rgba(46, 31, 14, 0.1);
+  color-scheme: light;
+}
+
+/* ——— Royal SAMAYA: navy-black, cream ink, blue + gold ——— */
+[data-theme="royal"] {
+  --paper: #0d1226;
+  --paper-raised: #131a33;
+  --paper-sunken: #090d1c;
+  --ink: #ece4d2;
+  --ink-soft: rgba(236, 228, 210, 0.66);
+  --ink-faint: rgba(236, 228, 210, 0.42);
+  --line: rgba(236, 228, 210, 0.16);
+  --line-strong: rgba(236, 228, 210, 0.36);
+  --aura-pink: #5468d4;
+  --aura-coral: #d9a428;
+  --aura-orange: #f3cf6d;
+  --aura-peach: #2a3fb8;
+  --sage: #8db9aa;
+  --sage-deep: #a5cfc0;
+  --aura-opacity: 0.75;
+  --grain-opacity: 0.06;
+  --shadow-soft: 0 2px 24px rgba(0, 0, 0, 0.45);
+  color-scheme: dark;
+}
+
+/* ——— Ultraviolet: purple-black, violet/magenta glow ——— */
+[data-theme="ultraviolet"] {
+  --paper: #150e20;
+  --paper-raised: #1c1329;
+  --paper-sunken: #100a19;
+  --ink: #eee6f8;
+  --ink-soft: rgba(238, 230, 248, 0.66);
+  --ink-faint: rgba(238, 230, 248, 0.42);
+  --line: rgba(238, 230, 248, 0.16);
+  --line-strong: rgba(238, 230, 248, 0.36);
+  --aura-pink: #e05fa8;
+  --aura-coral: #9a4fe0;
+  --aura-orange: #5d3fd3;
+  --aura-peach: #c78ff0;
+  --sage: #6fd6c3;
+  --sage-deep: #8fe6d6;
+  --aura-opacity: 0.8;
+  --grain-opacity: 0.06;
+  --shadow-soft: 0 2px 24px rgba(0, 0, 0, 0.5);
+  color-scheme: dark;
+}
+
+/* ——— Terminal: near-black, phosphor green ——— */
+[data-theme="terminal"] {
+  --paper: #0a0f0a;
+  --paper-raised: #101710;
+  --paper-sunken: #060a06;
+  --ink: #c8f5c0;
+  --ink-soft: rgba(200, 245, 192, 0.64);
+  --ink-faint: rgba(200, 245, 192, 0.4);
+  --line: rgba(200, 245, 192, 0.16);
+  --line-strong: rgba(200, 245, 192, 0.36);
+  --aura-pink: #39ff14;
+  --aura-coral: #1fbf5e;
+  --aura-orange: #7dff5e;
+  --aura-peach: #0f7a3d;
+  --sage: #39ff14;
+  --sage-deep: #7dff5e;
+  --aura-opacity: 0.5;
+  --grain-opacity: 0.09;
+  --shadow-soft: 0 2px 24px rgba(0, 0, 0, 0.55);
+  color-scheme: dark;
+}
+
 @theme inline {
   --color-paper: var(--paper);
   --color-paper-raised: var(--paper-raised);

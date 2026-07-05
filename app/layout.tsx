@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Fraunces, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import { Analytics } from "@vercel/analytics/next";
 import "./globals.css";
-import { AuraBloom } from "@/components/atmosphere/AuraBloom";
+import { ThemeAtmosphere } from "@/components/atmosphere/ThemeAtmosphere";
 import { CursorTrail } from "@/components/atmosphere/CursorTrail";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { StoreHydrator } from "@/components/StoreHydrator";
@@ -34,7 +34,7 @@ export const viewport: Viewport = {
 };
 
 // Applies the persisted theme before first paint to avoid a flash.
-const themeScript = `try{var q=new URLSearchParams(location.search).get("theme");var t=q||localStorage.getItem("aura-theme");if(t==="night")document.documentElement.setAttribute("data-theme","night")}catch(e){}`;
+const themeScript = `try{var q=new URLSearchParams(location.search).get("theme");var t=q||localStorage.getItem("aura-theme");if(t&&t!=="day")document.documentElement.setAttribute("data-theme",t);var k=localStorage.getItem("aura-intensity");if(k)document.documentElement.style.setProperty("--aura-user",k)}catch(e){}`;
 
 export default function RootLayout({
   children,
@@ -46,7 +46,7 @@ export default function RootLayout({
       >
         <script dangerouslySetInnerHTML={{ __html: themeScript }} />
         <Analytics />
-        <AuraBloom />
+        <ThemeAtmosphere />
         <CursorTrail />
         <StoreHydrator />
         <div className="relative" style={{ zIndex: 1 }}>
