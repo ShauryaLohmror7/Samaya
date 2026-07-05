@@ -1,0 +1,14 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(git init *)",
+      "Bash(npm install *)",
+      "Bash(npx tsc *)",
+      "Bash(npm run *)",
+      "Bash(git add *)",
+      "Bash(git commit -q -m 'chore: scaffold + design system *)",
+      "Bash(git commit -q -m 'feat: data layer — types, store slices, IndexedDB persistence, seed, export/import *)"
+    ]
+  }
+}
