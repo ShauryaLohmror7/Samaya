@@ -339,6 +339,47 @@ body {
   }
 }
 
+/* ——— maker's mark: gold faux-Devanagari signature ——— */
+
+.samaya-sign {
+  font-family: var(--font-fraunces), Georgia, serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  line-height: 1.15;
+  letter-spacing: 0.03em;
+  /* the shirorekha — the continuous bar Devanagari letters hang from */
+  border-top: 1.5px solid #cf9d2a;
+  padding-top: 3px;
+  /* gold ink */
+  background-image: linear-gradient(
+    100deg,
+    #a9761a 0%,
+    #e6b636 34%,
+    #f7dd84 50%,
+    #d9a428 66%,
+    #b8860b 100%
+  );
+  background-size: 220% 100%;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  /* dual shadow: dark edge for light papers, faint gold halo for dark themes */
+  filter: drop-shadow(0 1px 1.5px rgba(0, 0, 0, 0.42))
+    drop-shadow(0 0 4px rgba(217, 164, 40, 0.25));
+  opacity: 0.82;
+  animation: sign-shimmer 11s ease-in-out infinite;
+}
+
+@keyframes sign-shimmer {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
 /* ——— motion safety ——— */
 
 @media (prefers-reduced-motion: reduce) {

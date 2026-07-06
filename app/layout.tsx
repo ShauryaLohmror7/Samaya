@@ -6,6 +6,7 @@ import { ThemeAtmosphere } from "@/components/atmosphere/ThemeAtmosphere";
 import { CursorTrail } from "@/components/atmosphere/CursorTrail";
 import { SiteNav } from "@/components/nav/SiteNav";
 import { StoreHydrator } from "@/components/StoreHydrator";
+import { Signature } from "@/components/Signature";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -49,6 +50,7 @@ export default function RootLayout({
         <ThemeAtmosphere />
         <CursorTrail />
         <StoreHydrator />
+        <Signature />
         <div className="relative" style={{ zIndex: 1 }}>
           <SiteNav />
           <main className="mx-auto w-full max-w-6xl px-5 pb-24 sm:px-8">
