@@ -548,7 +548,12 @@ export const useAura = create<AuraState>()(
         const t = get().timer;
         // Stopping mid-focus still logs the honest elapsed time (≥1 min).
         if (t.phase === "focus" && t.focusStartedAt) {
-          const elapsedMin = Math.round((Date.now() - new Date(t.focusStartedAt).getTime()) / 60_000);
+          const totalMs = t.focusMinutes * 60_000;
+          const remainingMs =
+            t.pausedRemainingMs ??
+            (t.endsAt ? Math.max(0, new Date(t.endsAt).getTime() - Date.now()) : 0);
+          const activeMs = Math.min(totalMs, Math.max(0, totalMs - remainingMs));
+          const elapsedMin = Math.round(activeMs / 60_000);
           if (elapsedMin >= 1 && t.subjectId) {
             get().logSession({
               subjectId: t.subjectId,
