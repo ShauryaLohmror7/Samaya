@@ -18,7 +18,7 @@ const NEXT: Record<Status, string> = {
  */
 export function WeeklyGrid({ subject }: { subject: Subject }) {
   const cycleWeekStatus = useAura((s) => s.cycleWeekStatus);
-  const deleteCustomAspect = useAura((s) => s.deleteCustomAspect);
+  const deleteAspect = useAura((s) => s.deleteAspect);
   const hue = AURA_HUE_VAR[subject.color];
   const tracks = subjectWeeklyTracks(subject);
 
@@ -47,21 +47,19 @@ export function WeeklyGrid({ subject }: { subject: Subject }) {
                 <td className="sticky left-0 z-10 whitespace-nowrap pr-4 text-xs uppercase tracking-[0.14em]" style={{ color: "var(--ink-soft)", background: "transparent" }}>
                   <span className="flex items-center gap-2">
                     <span>{track.label}</span>
-                    {trackCustomId && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (confirm(`Delete "${track.label}" from ${subject.code}? Logged sessions for it will move to General.`)) {
-                            deleteCustomAspect(subject.id, trackCustomId);
-                          }
-                        }}
-                        aria-label={`Delete ${track.label}`}
-                        className="font-mono text-xs opacity-45 transition-opacity hover:opacity-100"
-                        style={{ color: "var(--ink)" }}
-                      >
-                        x
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (confirm(`Delete "${track.label}" from ${subject.code}? Logged sessions for it will move to General.`)) {
+                          deleteAspect(subject.id, track.key as Category | CustomSessionCategory);
+                        }
+                      }}
+                      aria-label={`Delete ${track.label}`}
+                      className="font-mono text-xs opacity-45 transition-opacity hover:opacity-100"
+                      style={{ color: "var(--ink)" }}
+                    >
+                      x
+                    </button>
                   </span>
                 </td>
                 {subject.weeks.map((w) => {

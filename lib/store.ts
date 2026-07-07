@@ -85,6 +85,7 @@ interface AuraState {
   updateSubject: (id: string, patch: Partial<Subject>) => void;
   deleteSubject: (id: string) => void;
   addCustomAspect: (subjectId: string, label: string) => void;
+  deleteAspect: (subjectId: string, category: Category | CustomSessionCategory) => void;
   deleteCustomAspect: (subjectId: string, aspectId: string) => void;
   setWeekStatus: (subjectId: string, week: number, category: Category | CustomSessionCategory, status: Status) => void;
   cycleWeekStatus: (subjectId: string, week: number, category: Category | CustomSessionCategory) => void;
@@ -213,6 +214,7 @@ export const useAura = create<AuraState>()(
             homework: "todo" as const,
             tutorial: "todo" as const,
           })),
+          hiddenAspects: input.hiddenAspects ?? [],
           customAspects: input.customAspects ?? [],
           pastPapers: [],
           focusTopics: [],
@@ -262,17 +264,23 @@ export const useAura = create<AuraState>()(
           };
         }),
 
-      deleteCustomAspect: (subjectId, aspectId) =>
+      deleteAspect: (subjectId, category) =>
         set((s) => {
-          const category: CustomSessionCategory = `custom:${aspectId}`;
+          const customId = customCategoryId(category);
           return {
             subjects: updateSubjectIn(s.subjects, subjectId, (subj) => ({
               ...subj,
-              customAspects: (subj.customAspects ?? []).filter((aspect) => aspect.id !== aspectId),
-              weeks: subj.weeks.map((w) => {
-                const { [aspectId]: _removed, ...custom } = w.custom ?? {};
-                return { ...w, custom };
-              }),
+              ...(customId
+                ? {
+                    customAspects: (subj.customAspects ?? []).filter((aspect) => aspect.id !== customId),
+                    weeks: subj.weeks.map((w) => {
+                      const { [customId]: _removed, ...custom } = w.custom ?? {};
+                      return { ...w, custom };
+                    }),
+                  }
+                : {
+                    hiddenAspects: [...new Set([...(subj.hiddenAspects ?? []), category as Category])],
+                  }),
             })),
             sessions: s.sessions.map((session) =>
               session.subjectId === subjectId && session.category === category
@@ -285,6 +293,10 @@ export const useAura = create<AuraState>()(
                 : s.timer,
           };
         }),
+
+      deleteCustomAspect: (subjectId, aspectId) => {
+        get().deleteAspect(subjectId, `custom:${aspectId}`);
+      },
 
       setWeekStatus: (subjectId, week, category, status) =>
         set((s) => ({
@@ -663,6 +675,7 @@ export const useAura = create<AuraState>()(
           subjects: bundle.subjects.map((s, i) => ({
             ...s,
             aurora: s.aurora ?? palettes[i % palettes.length]!,
+            hiddenAspects: s.hiddenAspects ?? [],
             customAspects: s.customAspects ?? [],
             weeks: s.weeks.map((w) => ({
               ...w,
@@ -690,6 +703,7 @@ export const useAura = create<AuraState>()(
           state.subjects = state.subjects.map((s, i) => ({
             ...s,
             aurora: s.aurora ?? palettes[i % palettes.length]!,
+            hiddenAspects: s.hiddenAspects ?? [],
             customAspects: s.customAspects ?? [],
             weeks: s.weeks.map((w) => ({
               ...w,

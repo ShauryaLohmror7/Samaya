@@ -36,8 +36,9 @@ export function isWeeklyCategory(category: SessionCategory | null | undefined): 
 }
 
 export function subjectWeeklyTracks(subject: Subject): WeeklyTrack[] {
+  const hidden = new Set(subject.hiddenAspects ?? []);
   return [
-    ...BUILTIN_TRACKS,
+    ...BUILTIN_TRACKS.filter((track) => !hidden.has(track.key as Category)),
     ...(subject.customAspects ?? []).map((aspect) => ({
       key: customCategory(aspect.id),
       label: aspect.label,
@@ -55,8 +56,14 @@ export function categoryLabel(category: SessionCategory | null | undefined, subj
 }
 
 export function sessionCategoryOptions(subject?: Subject): { value: SessionCategory; label: string }[] {
+  const hidden = new Set(subject?.hiddenAspects ?? []);
   return [
-    ...BASE_SESSION_CATEGORIES,
+    ...BASE_SESSION_CATEGORIES.filter((option) => {
+      if (option.value !== "lecture" && option.value !== "homework" && option.value !== "tutorial") {
+        return true;
+      }
+      return !hidden.has(option.value);
+    }),
     ...(subject?.customAspects ?? []).map((aspect) => ({
       value: customCategory(aspect.id),
       label: aspect.label,

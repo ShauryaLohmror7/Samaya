@@ -46,31 +46,34 @@ export function subjectCompletion(subject: Subject): number {
     const ms = subject.milestones ?? [];
     const msScore =
       ms.length > 0 ? ms.reduce((a, m) => a + statusValue[m.status], 0) / ms.length : 0;
-    return ms.length > 0 ? msScore : weeklyScore(subject);
+    return ms.length > 0 ? msScore : weeklyScore(subject) ?? 0;
   }
 
   const weekly = weeklyScore(subject);
-  if (subject.pastPapers.length === 0) return weekly;
+  if (subject.pastPapers.length === 0) return weekly ?? 0;
   const papers =
     subject.pastPapers.reduce((a, p) => a + statusValue[p.status], 0) /
     subject.pastPapers.length;
+  if (weekly == null) return papers;
   return weekly * 0.7 + papers * 0.3;
 }
 
-function weeklyScore(subject: Subject): number {
+function weeklyScore(subject: Subject): number | null {
   if (subject.weeks.length === 0) return 0;
   const weights = { lecture: 0.3, homework: 0.2, tutorial: 0.2 } as const;
-  const customTracks = subjectWeeklyTracks(subject).filter((track) => customCategoryId(track.key));
+  const tracks = subjectWeeklyTracks(subject);
+  if (tracks.length === 0) return null;
   const customWeight = 0.2;
-  const totalWeight = 0.7 + customTracks.length * customWeight;
+  const totalWeight = tracks.reduce((total, track) => {
+    const customId = customCategoryId(track.key);
+    return total + (customId ? customWeight : weights[track.key as Category]);
+  }, 0);
   let acc = 0;
   for (const w of subject.weeks) {
-    acc +=
-      statusValue[w.lecture] * weights.lecture +
-      statusValue[w.homework] * weights.homework +
-      statusValue[w.tutorial] * weights.tutorial;
-    for (const track of customTracks) {
-      acc += statusValue[weekStatusForTrack(w, track.key)] * customWeight;
+    for (const track of tracks) {
+      const customId = customCategoryId(track.key);
+      const weight = customId ? customWeight : weights[track.key as Category];
+      acc += statusValue[weekStatusForTrack(w, track.key)] * weight;
     }
   }
   return acc / (subject.weeks.length * totalWeight);

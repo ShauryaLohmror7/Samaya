@@ -57,6 +57,7 @@ export interface Subject {
   totalWeeks: number;
   examDate?: string; // ISO — exam for courses, deadline for projects
   weeks: WeekProgress[];
+  hiddenAspects?: Category[];
   customAspects?: CustomAspect[];
   pastPapers: PastPaper[];
   focusTopics: FocusTopic[];
